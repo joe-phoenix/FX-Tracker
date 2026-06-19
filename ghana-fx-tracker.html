@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghana FX Tracker — Labari</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --forest: #0D2B1F; --forest-mid: #1A4030; --sage: #4A7C5F;
+    --gold: #E8A830; --gold-light: #F5C85A; --cream: #F7F4EE;
+    --white: #FFFFFF; --text-main: #0D1F17; --text-muted: #5C7268;
+    --border: #D6DDD8; --red: #C0392B; --green-bright: #27AE60;
+    --card-shadow: 0 1px 3px rgba(13,43,31,0.08), 0 4px 16px rgba(13,43,31,0.06);
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text-main); min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--forest); padding: 0 24px; }
+  .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+  .labari-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .labari-logo { width: 28px; height: 28px; background: var(--gold); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--forest); }
+  .labari-name { font-size: 13px; font-weight: 600; color: var(--cream); letter-spacing: 0.05em; text-transform: uppercase; }
+  .header-tag { font-size: 11px; color: var(--sage); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* HERO */
+  .hero { background: var(--forest); padding: 40px 24px 48px; border-bottom: 3px solid var(--gold); }
+  .hero-inner { max-width: 1100px; margin: 0 auto; }
+  .hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .hero-title { font-family: 'DM Serif Display', serif; font-size: clamp(32px, 5vw, 52px); color: var(--white); line-height: 1.1; max-width: 640px; margin-bottom: 16px; }
+  .hero-sub { font-size: 14px; color: #8AADA0; max-width: 500px; line-height: 1.6; }
+
+  /* CONTROLS */
+  .controls { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 8px rgba(13,43,31,0.08); }
+  .controls-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 16px; padding: 12px 0; flex-wrap: wrap; }
+  .currency-tabs { display: flex; gap: 4px; background: var(--cream); padding: 4px; border-radius: 8px; }
+  .currency-tab { padding: 6px 14px; border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  .currency-tab.active { background: var(--forest); color: var(--white); }
+  .controls-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .last-updated { font-size: 12px; color: var(--text-muted); }
+  .data-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; border: 1px solid; }
+  .data-badge.live { background: #E8F8EF; color: var(--green-bright); border-color: #A9DFBF; }
+  .data-badge.seed { background: #FFF3CD; color: #856404; border-color: #FFEAA7; }
+  .refresh-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--forest); color: var(--white); border: none; border-radius: 7px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; letter-spacing: 0.02em; }
+  .refresh-btn:hover { background: var(--forest-mid); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .refresh-icon { font-size: 14px; }
+  .refresh-btn.spinning .refresh-icon { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ERROR BANNER */
+  .error-banner { background: #FDECEA; border: 1px solid #F5B7B1; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--red); display: none; max-width: 1100px; margin: 16px auto 0; padding-left: 24px; }
+  .error-banner.show { display: block; }
+
+  /* SUMMARY */
+  .summary-section { max-width: 1100px; margin: 0 auto; padding: 28px 24px 8px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .summary-card { background: var(--white); border-radius: 10px; padding: 18px 20px; box-shadow: var(--card-shadow); border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .summary-card.bog::before { background: var(--gold); }
+  .summary-card.best::before { background: var(--green-bright); }
+  .summary-card.worst::before { background: var(--red); }
+  .summary-card.spread::before { background: var(--sage); }
+  .summary-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .summary-value { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text-main); line-height: 1; margin-bottom: 4px; }
+  .summary-bank { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+  /* BANKS */
+  .banks-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 48px; }
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .section-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+  .bog-card { background: var(--forest); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .bog-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+  .bog-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); margin-bottom: 2px; }
+  .bog-desc { font-size: 12px; color: #8AADA0; }
+  .bog-rates { display: flex; gap: 24px; text-align: center; }
+  .bog-rate-type { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: var(--gold-light); text-transform: uppercase; margin-bottom: 2px; }
+  .bog-rate-val { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--white); line-height: 1; }
+
+  .bank-table-wrap { background: var(--white); border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--cream); border-bottom: 2px solid var(--border); }
+  th { padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+  th.num { text-align: right; }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { color: var(--forest); }
+  .sort-arrow { margin-left: 4px; font-size: 10px; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #F9FBF9; }
+  td { padding: 14px 16px; font-size: 14px; vertical-align: middle; }
+  td.num { text-align: right; }
+  .bank-cell { display: flex; align-items: center; gap: 10px; }
+  .bank-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: var(--white); letter-spacing: 0.02em; }
+  .bank-name { font-weight: 600; font-size: 13px; }
+  .bank-type { font-size: 11px; color: var(--text-muted); }
+  .rate-val { font-family: 'DM Serif Display', serif; font-size: 18px; }
+  .spread-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: #EEF2F0; color: var(--text-muted); }
+  .spread-pill.tight { background: #E8F8EF; color: var(--green-bright); }
+  .spread-pill.wide { background: #FDECEA; color: var(--red); }
+  .rank-badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin: 0 auto; }
+  .rank-1 { background: #FFF3CD; color: #B7860B; }
+  .rank-2 { background: #E8F4FD; color: #2471A3; }
+  .rank-3 { background: #F2E9FF; color: #7D3C98; }
+  .rank-other { background: var(--cream); color: var(--text-muted); }
+  .dtype-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .dtype-dot.live { background: var(--green-bright); }
+  .dtype-dot.estimated { background: #F39C12; }
+
+  /* CONVERTER */
+  .convert-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 48px; }
+  .convert-card { background: var(--white); border-radius: 12px; box-shadow: var(--card-shadow); border: 1px solid var(--border); padding: 24px; }
+  .convert-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 20px; }
+  .convert-grid { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 12px; align-items: end; }
+  .convert-field label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+  .convert-field input, .convert-field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--text-main); background: var(--white); outline: none; transition: border-color 0.15s; }
+  .convert-field input:focus, .convert-field select:focus { border-color: var(--forest); }
+  .swap-btn { width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 50%; background: var(--white); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: var(--forest); margin-bottom: 2px; }
+  .swap-btn:hover { background: var(--forest); color: var(--white); border-color: var(--forest); }
+  .convert-result { background: var(--forest); border-radius: 10px; padding: 16px 20px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .convert-result-label { font-size: 12px; color: #8AADA0; }
+  .convert-result-val { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--white); margin-top: 2px; }
+  .convert-result-bank { font-size: 12px; font-weight: 600; color: var(--gold); margin-top: 4px; }
+  .convert-note { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 12px; }
+
+  /* SKELETON LOADER */
+  .skeleton { background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; display: inline-block; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* FOOTER */
+  footer { background: var(--forest); padding: 20px 24px; text-align: center; }
+  .footer-text { font-size: 11px; color: #8AADA0; line-height: 1.6; }
+  .footer-text a { color: var(--gold); text-decoration: none; }
+
+  /* API CONFIG PANEL */
+  .api-config { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 12px 24px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .api-config code { background: var(--cream); padding: 2px 6px; border-radius: 4px; font-size: 11px; color: var(--forest); font-family: monospace; }
+  .api-config-label { font-weight: 600; }
+
+  @media (max-width: 700px) {
+    .bog-card { grid-template-columns: 1fr; }
+    .bog-rates { justify-content: flex-start; }
+    th:nth-child(6), td:nth-child(6) { display: none; }
+    .convert-grid { grid-template-columns: 1fr; }
+    .swap-btn { width: 100%; border-radius: 8px; }
+    .controls-right { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="#" class="labari-brand">
+      <div class="labari-logo">L</div>
+      <span class="labari-name">Labari</span>
+    </a>
+    <span class="header-tag">Resources</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">🇬🇭 Ghana FX Tracker</div>
+    <h1 class="hero-title">Compare dollar rates across every major bank</h1>
+    <p class="hero-sub">Live buying and selling rates from Bank of Ghana and commercial banks. Updated daily from public rate sheets.</p>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="controls-inner">
+    <div class="currency-tabs">
+      <button class="currency-tab active" data-currency="USD">USD</button>
+      <button class="currency-tab" data-currency="GBP">GBP</button>
+      <button class="currency-tab" data-currency="EUR">EUR</button>
+    </div>
+    <div class="controls-right">
+      <span class="last-updated" id="lastUpdated">—</span>
+      <span class="data-badge" id="dataBadge" style="display:none;"></span>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadRates()">
+        <span class="refresh-icon">↻</span> Refresh
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- API config notice — remove once backend is deployed -->
+<div class="api-config" id="apiConfigNotice">
+  <span class="api-config-label">⚙ API Backend:</span>
+  <span>Point this to your deployed API server:</span>
+  <code id="apiUrlDisplay">http://localhost:3001</code>
+  <button onclick="promptApiUrl()" style="font-size:11px;padding:3px 8px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--white);">Change URL</button>
+</div>
+
+<div class="error-banner" id="errorBanner"></div>
+
+<div class="summary-section">
+  <div class="summary-grid">
+    <div class="summary-card bog">
+      <div class="summary-label">Bank of Ghana</div>
+      <div class="summary-value" id="bogRate"><span class="skeleton" style="width:120px;height:28px;">&nbsp;</span></div>
+      <div class="summary-bank" id="bogDate">Reference / interbank</div>
+    </div>
+    <div class="summary-card best">
+      <div class="summary-label">Best buying rate 🏆</div>
+      <div class="summary-value" id="bestBuy"><span class="skeleton" style="width:120px;height:28px;">&nbsp;</span></div>
+      <div class="summary-bank" id="bestBuyBank">—</div>
+    </div>
+    <div class="summary-card worst">
+      <div class="summary-label">Worst buying rate ⚠</div>
+      <div class="summary-value" id="worstBuy"><span class="skeleton" style="width:120px;height:28px;">&nbsp;</span></div>
+      <div class="summary-bank" id="worstBuyBank">—</div>
+    </div>
+    <div class="summary-card spread">
+      <div class="summary-label">Average spread</div>
+      <div class="summary-value" id="avgSpread"><span class="skeleton" style="width:80px;height:28px;">&nbsp;</span></div>
+      <div class="summary-bank">Buy–sell difference (GHS)</div>
+    </div>
+  </div>
+</div>
+
+<div class="banks-section">
+  <div class="section-header">
+    <div class="section-title">All Banks</div>
+    <div class="section-count" id="bankCount">Loading…</div>
+  </div>
+
+  <div class="bog-card">
+    <div>
+      <div class="bog-label">Central Bank · Reference Rate</div>
+      <div class="bog-name">Bank of Ghana</div>
+      <div class="bog-desc">Interbank weighted average — not a commercial buying/selling rate</div>
+    </div>
+    <div class="bog-rates">
+      <div>
+        <div class="bog-rate-type">Buying</div>
+        <div class="bog-rate-val" id="bogBuyVal">—</div>
+      </div>
+      <div>
+        <div class="bog-rate-type">Selling</div>
+        <div class="bog-rate-val" id="bogSellVal">—</div>
+      </div>
+      <div>
+        <div class="bog-rate-type">Mid</div>
+        <div class="bog-rate-val" id="bogMidVal">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bank-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36px;" class="num">#</th>
+          <th>Bank</th>
+          <th class="num sortable" onclick="sortTable('buying')">Buying <span class="sort-arrow" id="sort-buying">↑</span></th>
+          <th class="num sortable" onclick="sortTable('selling')">Selling <span class="sort-arrow" id="sort-selling">↕</span></th>
+          <th class="num sortable" onclick="sortTable('spread')">Spread <span class="sort-arrow" id="sort-spread">↕</span></th>
+          <th class="num">Data</th>
+        </tr>
+      </thead>
+      <tbody id="bankTableBody">
+        <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">
+          <div class="skeleton" style="width:60%;height:16px;margin:0 auto;"></div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:11px;color:var(--text-muted);margin-top:10px;font-style:italic;">
+    🟢 Live = scraped directly from bank website. 🟠 Estimated = derived from BoG mid rate + observed bank spread profile.
+    All rates are indicative. Confirm with your bank before transacting.
+  </p>
+</div>
+
+<div class="convert-section">
+  <div class="convert-card">
+    <div class="convert-title">Currency Converter</div>
+    <div class="convert-grid">
+      <div class="convert-field">
+        <label>Amount</label>
+        <input type="number" id="convertAmount" value="100" min="0" oninput="updateConvert()">
+      </div>
+      <div>
+        <button class="swap-btn" onclick="swapDirection()" title="Swap direction">⇄</button>
+      </div>
+      <div class="convert-field">
+        <label>Direction</label>
+        <select id="convertDir" onchange="updateConvert()">
+          <option value="buy">USD → GHS (I'm buying USD)</option>
+          <option value="sell">GHS → USD (I'm selling USD)</option>
+        </select>
+      </div>
+      <div class="convert-field">
+        <label>Bank</label>
+        <select id="convertBank" onchange="updateConvert()">
+          <option value="">Select a bank</option>
+        </select>
+      </div>
+    </div>
+    <div class="convert-result" id="convertResult" style="display:none;">
+      <div>
+        <div class="convert-result-label" id="convertResultLabel">You receive</div>
+        <div class="convert-result-val" id="convertResultVal">—</div>
+        <div class="convert-result-bank" id="convertResultBank">—</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="convert-result-label">Rate used</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--white);margin-top:4px;" id="convertRateUsed">—</div>
+      </div>
+    </div>
+    <p class="convert-note">Indicative only. Bank fees, commissions, and minimum amounts not included. Always confirm before transacting.</p>
+  </div>
+</div>
+
+<footer>
+  <p class="footer-text">
+    Ghana FX Tracker is a <a href="https://labarijournal.com">Labari</a> resource. Data from Bank of Ghana and publicly available bank rate sheets.<br>
+    Rates are indicative and updated on business days. Not financial advice. · <a href="https://labarijournal.com">Labari Journal</a> · <a href="https://techlabari.com">TechLabari</a>
+  </p>
+</footer>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Change API_BASE to your deployed backend URL.
+// e.g. 'https://ghana-fx-api.onrender.com' or 'https://your-server.com'
+let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'http://localhost:3001';
+
+function promptApiUrl() {
+  const url = prompt('Enter API base URL (e.g. https://ghana-fx-api.onrender.com):', API_BASE);
+  if (url && url.trim()) {
+    API_BASE = url.trim().replace(/\/$/, '');
+    localStorage.setItem('ghanaFxApiBase', API_BASE);
+    document.getElementById('apiUrlDisplay').textContent = API_BASE;
+    loadRates();
+  }
+}
+document.getElementById('apiUrlDisplay').textContent = API_BASE;
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const state = {
+  currency: 'USD',
+  data: null,
+  sortKey: 'buying',
+  sortDir: 'asc',
+};
+
+// ─── FETCH RATES ──────────────────────────────────────────────────────────────
+async function loadRates() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+
+  try {
+    const url = `${API_BASE}/api/rates?currency=${state.currency}`;
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error(`API returned ${res.status}: ${await res.text()}`);
+
+    const data = await res.json();
+    state.data = data;
+
+    hideError();
+    renderAll(data);
+
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent =
+      'Updated ' + now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' });
+
+    // Show data method badge
+    const badge = document.getElementById('dataBadge');
+    const liveCount = data.banks.filter(b => b.dataType === 'live').length;
+    badge.style.display = 'inline';
+    if (liveCount > 0) {
+      badge.className = 'data-badge live';
+      badge.textContent = `${liveCount} live`;
+    } else {
+      badge.className = 'data-badge seed';
+      badge.textContent = data.bog.dataMethod === 'seed' ? 'Seed data' : 'Estimated';
+    }
+
+  } catch (err) {
+    showError(`Could not reach the API at ${API_BASE}. Is the backend running? ${err.message}`);
+    // Fall back to demo data so the UI isn't blank
+    renderDemo();
+  } finally {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+}
+
+// ─── DEMO FALLBACK ────────────────────────────────────────────────────────────
+// Uses real BoG rates from 19 Jun 2026 when API is unavailable
+function renderDemo() {
+  const bogRates = { USD: 11.2150, GBP: 14.8279, EUR: 13.1500 };
+  const mid = bogRates[state.currency];
+  const BANK_DEFS = [
+    { id:'gcb',      name:'GCB Bank',              shortName:'GCB', type:'State-owned',  color:'#1A5276', premPct:0.8,  spPct:1.4 },
+    { id:'absa',     name:'Absa Ghana',             shortName:'ABS', type:'International',color:'#B22222', premPct:1.2,  spPct:2.8 },
+    { id:'ecobank',  name:'Ecobank Ghana',          shortName:'ECO', type:'Pan-African',  color:'#006400', premPct:1.0,  spPct:2.2 },
+    { id:'stanbic',  name:'Stanbic Bank',           shortName:'STB', type:'Commercial',   color:'#1F618D', premPct:1.3,  spPct:3.0 },
+    { id:'scb',      name:'Standard Chartered',     shortName:'SCB', type:'International',color:'#00529B', premPct:1.5,  spPct:3.2 },
+    { id:'fidelity', name:'Fidelity Bank',          shortName:'FID', type:'Commercial',   color:'#7D3C98', premPct:0.9,  spPct:1.8 },
+    { id:'cbg',      name:'Consolidated Bank',      shortName:'CBG', type:'State-owned',  color:'#CA6F1E', premPct:0.7,  spPct:1.3 },
+    { id:'republic', name:'Republic Bank Ghana',    shortName:'REP', type:'Commercial',   color:'#117A65', premPct:1.0,  spPct:2.0 },
+    { id:'calbank',  name:'CalBank',                shortName:'CAL', type:'Commercial',   color:'#884EA0', premPct:1.1,  spPct:2.3 },
+    { id:'access',   name:'Access Bank Ghana',      shortName:'ACC', type:'Commercial',   color:'#E74C3C', premPct:1.2,  spPct:2.6 },
+    { id:'zenith',   name:'Zenith Bank Ghana',      shortName:'ZEN', type:'Commercial',   color:'#8E44AD', premPct:1.1,  spPct:2.4 },
+    { id:'gtbank',   name:'GTBank Ghana',           shortName:'GTB', type:'Commercial',   color:'#F39C12', premPct:1.0,  spPct:2.1 },
+    { id:'uba',      name:'UBA Ghana',              shortName:'UBA', type:'Pan-African',  color:'#A93226', premPct:1.1,  spPct:2.3 },
+    { id:'fab',      name:'First Atlantic Bank',    shortName:'FAB', type:'Commercial',   color:'#148F77', premPct:1.0,  spPct:2.0 },
+    { id:'adb',      name:'Agricultural Dev. Bank', shortName:'ADB', type:'State-owned',  color:'#196F3D', premPct:0.6,  spPct:1.2 },
+    { id:'pru',      name:'Prudential Bank',        shortName:'PRU', type:'Commercial',   color:'#1F618D', premPct:1.0,  spPct:2.0 },
+  ];
+  const banks = BANK_DEFS.map(b => {
+    const bankMid = +(mid * (1 + b.premPct / 100)).toFixed(4);
+    const half    = +(bankMid * b.spPct / 200).toFixed(4);
+    const buying  = +(bankMid - half).toFixed(4);
+    const selling = +(bankMid + half).toFixed(4);
+    const spread  = +(selling - buying).toFixed(4);
+    return { ...b, buying, selling, mid: bankMid, spread, spreadPct: +(spread/bankMid*100).toFixed(2), dataType: 'estimated' };
+  });
+
+  const demoData = {
+    currency: state.currency,
+    asOf: '19 Jun 2026',
+    bog: { buying: mid - 0.006, selling: mid + 0.006, mid, dataMethod: 'demo' },
+    summary: {
+      bestBuyRate:   Math.min(...banks.map(b => b.buying)),
+      worstBuyRate:  Math.max(...banks.map(b => b.buying)),
+      averageSpread: +(banks.reduce((s, b) => s + b.spread, 0) / banks.length).toFixed(4),
+      bankCount:     banks.length,
+      liveDataCount: 0,
+    },
+    banks,
+  };
+  state.data = demoData;
+  renderAll(demoData);
+
+  const badge = document.getElementById('dataBadge');
+  badge.style.display = 'inline';
+  badge.className = 'data-badge seed';
+  badge.textContent = 'Demo data';
+
+  document.getElementById('lastUpdated').textContent = 'BoG rate: 19 Jun 2026';
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll(data) {
+  renderSummary(data);
+  renderBoG(data.bog);
+  renderTable(data.banks);
+  populateConverter(data.banks);
+  updateConvert();
+}
+
+function fmt(n) { return n != null ? n.toFixed(4) : '—'; }
+
+function renderSummary(data) {
+  const { bog, summary, banks } = data;
+  document.getElementById('bogRate').textContent = 'GHS ' + fmt(bog.mid);
+  document.getElementById('bogDate').textContent = data.asOf ? `As of ${data.asOf}` : 'Interbank reference';
+  document.getElementById('avgSpread').textContent = 'GHS ' + fmt(summary.averageSpread);
+
+  const sorted = [...banks].sort((a, b) => a.buying - b.buying);
+  document.getElementById('bestBuy').textContent    = 'GHS ' + fmt(sorted[0]?.buying);
+  document.getElementById('bestBuyBank').textContent = sorted[0]?.name || '—';
+  document.getElementById('worstBuy').textContent    = 'GHS ' + fmt(sorted[sorted.length-1]?.buying);
+  document.getElementById('worstBuyBank').textContent = sorted[sorted.length-1]?.name || '—';
+}
+
+function renderBoG(bog) {
+  document.getElementById('bogBuyVal').textContent  = 'GHS ' + fmt(bog.buying);
+  document.getElementById('bogSellVal').textContent = 'GHS ' + fmt(bog.selling);
+  document.getElementById('bogMidVal').textContent  = 'GHS ' + fmt(bog.mid);
+}
+
+function sortTable(key) {
+  if (state.sortKey === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  else { state.sortKey = key; state.sortDir = 'asc'; }
+  if (state.data) renderTable(state.data.banks);
+}
+
+function renderTable(banks) {
+  ['buying','selling','spread'].forEach(k => {
+    const el = document.getElementById('sort-' + k);
+    if (el) el.textContent = k === state.sortKey ? (state.sortDir === 'asc' ? '↑' : '↓') : '↕';
+  });
+
+  const sorted = [...banks].sort((a, b) => {
+    const d = a[state.sortKey] - b[state.sortKey];
+    return state.sortDir === 'asc' ? d : -d;
+  });
+
+  document.getElementById('bankCount').textContent =
+    `${sorted.length} banks · ${banks.filter(b=>b.dataType==='live').length} live rates`;
+
+  const minBuy  = Math.min(...banks.map(b => b.buying));
+  const maxBuy  = Math.max(...banks.map(b => b.buying));
+  const minSprd = Math.min(...banks.map(b => b.spread));
+  const maxSprd = Math.max(...banks.map(b => b.spread));
+
+  document.getElementById('bankTableBody').innerHTML = sorted.map((bank, i) => {
+    const rank  = i + 1;
+    const rClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-other';
+    const spClass = bank.spread===minSprd?'tight':bank.spread===maxSprd?'wide':'';
+    const isBest  = bank.buying === minBuy;
+    const isWorst = bank.buying === maxBuy;
+
+    return `<tr>
+      <td class="num"><div class="rank-badge ${rClass}">${rank}</div></td>
+      <td>
+        <div class="bank-cell">
+          <div class="bank-avatar" style="background:${bank.color}">${bank.shortName}</div>
+          <div>
+            <div class="bank-name">${bank.name}${isBest?' 🏆':isWorst?' ⚠':''}</div>
+            <div class="bank-type">${bank.type}</div>
+          </div>
+        </div>
+      </td>
+      <td class="num"><span class="rate-val">${fmt(bank.buying)}</span></td>
+      <td class="num"><span class="rate-val">${fmt(bank.selling)}</span></td>
+      <td class="num"><span class="spread-pill ${spClass}">${fmt(bank.spread)}</span></td>
+      <td class="num">
+        <span class="dtype-dot ${bank.dataType}"></span>
+        <span style="font-size:11px;color:var(--text-muted);">${bank.dataType==='live'?'Live':'Est.'}</span>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── CONVERTER ────────────────────────────────────────────────────────────────
+function populateConverter(banks) {
+  const sel  = document.getElementById('convertBank');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Select a bank</option>';
+  banks.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name;
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+function swapDirection() {
+  const dir = document.getElementById('convertDir');
+  dir.value = dir.value === 'buy' ? 'sell' : 'buy';
+  updateConvert();
+}
+
+function updateConvert() {
+  const amount  = parseFloat(document.getElementById('convertAmount').value) || 0;
+  const dir     = document.getElementById('convertDir').value;
+  const bankId  = document.getElementById('convertBank').value;
+  const banks   = state.data?.banks || [];
+  const bank    = bankId ? banks.find(b => b.id === bankId) : null;
+  const el      = document.getElementById('convertResult');
+
+  if (!bank || !amount) { el.style.display = 'none'; return; }
+
+  const rate = dir === 'buy' ? bank.buying : bank.selling;
+  let result, label, formatted;
+
+  if (dir === 'buy') {
+    result    = +(amount * rate).toFixed(2);
+    label     = `${amount} ${state.currency} costs`;
+    formatted = `GHS ${result.toLocaleString('en-GH', { minimumFractionDigits: 2 })}`;
+  } else {
+    result    = +(amount / rate).toFixed(4);
+    label     = `GHS ${amount.toLocaleString()} buys`;
+    formatted = `${result.toLocaleString('en-GH', { maximumFractionDigits: 4 })} ${state.currency}`;
+  }
+
+  document.getElementById('convertResultLabel').textContent  = label;
+  document.getElementById('convertResultVal').textContent    = formatted;
+  document.getElementById('convertResultBank').textContent   = `${bank.name} · ${bank.dataType} rate`;
+  document.getElementById('convertRateUsed').textContent     =
+    dir === 'buy' ? `1 ${state.currency} = GHS ${rate}` : `GHS ${rate} = 1 ${state.currency}`;
+  el.style.display = 'flex';
+}
+
+// ─── ERROR HANDLING ───────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorBanner').classList.remove('show');
+}
+
+// ─── CURRENCY TABS ────────────────────────────────────────────────────────────
+document.querySelectorAll('.currency-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.currency-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.currency = tab.dataset.currency;
+    // Update converter direction labels
+    const dirSel = document.getElementById('convertDir');
+    const c = state.currency;
+    dirSel.innerHTML = `
+      <option value="buy">${c} → GHS (I'm buying ${c})</option>
+      <option value="sell">GHS → ${c} (I'm selling ${c})</option>
+    `;
+    loadRates();
+  });
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadRates();
+</script>
+</body>
+</html>
