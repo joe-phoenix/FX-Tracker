@@ -326,7 +326,7 @@
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 // Change API_BASE to your deployed backend URL.
 // e.g. 'https://ghana-fx-api.onrender.com' or 'https://your-server.com'
-let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'http://localhost:3001';
+let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'https://ghana-fx-api.onrender.com';
 
 function promptApiUrl() {
   const url = prompt('Enter API base URL (e.g. https://ghana-fx-api.onrender.com):', API_BASE);
