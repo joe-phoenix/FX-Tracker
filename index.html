@@ -189,8 +189,8 @@
   </div>
 </div>
 
-<!-- API config notice — remove once backend is deployed -->
-<div class="api-config" id="apiConfigNotice">
+<!-- API config notice — hidden, backend deployed -->
+<div class="api-config" id="apiConfigNotice" style="display:none;">
   <span class="api-config-label">⚙ API Backend:</span>
   <span>Point this to your deployed API server:</span>
   <code id="apiUrlDisplay">http://localhost:3001</code>
@@ -329,7 +329,7 @@
 let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'https://fx-tracker-rymo.onrender.com';
 
 function promptApiUrl() {
-  const url = prompt('Enter API base URL (e.g. https://fx-tracker-rymo.onrender.com):', API_BASE);
+  const url = prompt('Enter API base URL (e.g. https://ghana-fx-api.onrender.com):', API_BASE);
   if (url && url.trim()) {
     API_BASE = url.trim().replace(/\/$/, '');
     localStorage.setItem('ghanaFxApiBase', API_BASE);
