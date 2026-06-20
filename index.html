@@ -326,10 +326,10 @@
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 // Change API_BASE to your deployed backend URL.
 // e.g. 'https://ghana-fx-api.onrender.com' or 'https://your-server.com'
-let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'https://ghana-fx-api.onrender.com';
+let API_BASE = localStorage.getItem('ghanaFxApiBase') || 'https://fx-tracker-rymo.onrender.com';
 
 function promptApiUrl() {
-  const url = prompt('Enter API base URL (e.g. https://ghana-fx-api.onrender.com):', API_BASE);
+  const url = prompt('Enter API base URL (e.g. https://fx-tracker-rymo.onrender.com):', API_BASE);
   if (url && url.trim()) {
     API_BASE = url.trim().replace(/\/$/, '');
     localStorage.setItem('ghanaFxApiBase', API_BASE);
