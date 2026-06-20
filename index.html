@@ -3,7 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghana FX Tracker — Labari</title>
+
+<!-- Primary SEO -->
+<title>Ghana FX Tracker — Compare Bank Exchange Rates | Labari Media</title>
+<meta name="description" content="Compare live USD, GBP and EUR exchange rates across all 23 commercial banks in Ghana, including Bank of Ghana interbank rates. Updated daily. A Labari Media resource.">
+<meta name="keywords" content="Ghana exchange rates, Ghana forex rates, dollar rate Ghana, GHS USD, cedi to dollar, bank exchange rates Ghana, Bank of Ghana rate, GCB exchange rate, Absa Ghana forex, Ecobank Ghana rate, Fidelity Bank rate, compare bank rates Ghana">
+<meta name="author" content="Labari Media">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://joe-phoenix.github.io/FX-Tracker/">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://joe-phoenix.github.io/FX-Tracker/">
+<meta property="og:title" content="Ghana FX Tracker — Compare Bank Exchange Rates">
+<meta property="og:description" content="Live USD, GBP and EUR exchange rates from all 23 banks in Ghana. Compare buying and selling rates side by side. A Labari Media resource.">
+<meta property="og:site_name" content="Labari Media">
+<meta property="og:locale" content="en_GH">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@labarijournal">
+<meta name="twitter:title" content="Ghana FX Tracker — Compare Bank Exchange Rates">
+<meta name="twitter:description" content="Live USD, GBP and EUR exchange rates from all 23 banks in Ghana. Compare buying and selling rates side by side.">
+
+<!-- Geo targeting -->
+<meta name="geo.region" content="GH">
+<meta name="geo.placename" content="Accra, Ghana">
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Ghana FX Tracker",
+  "description": "Compare live USD, GBP and EUR exchange rates across all 23 commercial banks in Ghana, including Bank of Ghana interbank rates.",
+  "url": "https://joe-phoenix.github.io/FX-Tracker/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en-GH",
+  "isAccessibleForFree": true,
+  "publisher": {
+    "@type": "Organization",
+    "name": "Labari Media",
+    "url": "https://labarijournal.com",
+    "sameAs": [
+      "https://techlabari.com"
+    ]
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GHS"
+  }
+}
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -134,9 +189,22 @@
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
   /* FOOTER */
-  footer { background: var(--forest); padding: 20px 24px; text-align: center; }
-  .footer-text { font-size: 11px; color: #8AADA0; line-height: 1.6; }
-  .footer-text a { color: var(--gold); text-decoration: none; }
+  .resources-nav { font-size: 12px; font-weight: 500; color: #8AADA0; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.15s; }
+  .resources-nav:hover { color: var(--gold); }
+  .resources-nav-arrow { font-size: 14px; }
+
+  footer { background: var(--forest); padding: 32px 24px 24px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .footer-logo { width: 32px; height: 32px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--forest); flex-shrink: 0; }
+  .footer-brand-name { font-size: 14px; font-weight: 600; color: var(--white); }
+  .footer-brand-sub { font-size: 11px; color: #8AADA0; margin-top: 2px; }
+  .footer-links { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .footer-links a { font-size: 12px; color: #8AADA0; text-decoration: none; font-weight: 500; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .footer-bottom span { font-size: 11px; color: #5C7B6E; line-height: 1.6; }
+  .footer-copy { font-weight: 500; color: #8AADA0 !important; white-space: nowrap; }
 
   /* API CONFIG PANEL */
   .api-config { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 12px 24px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -159,9 +227,11 @@
   <div class="header-inner">
     <a href="#" class="labari-brand">
       <div class="labari-logo">L</div>
-      <span class="labari-name">Labari</span>
+      <span class="labari-name">Labari Media</span>
     </a>
-    <span class="header-tag">Resources</span>
+    <a href="#" class="resources-nav">
+      <span class="resources-nav-arrow">←</span> Labari Media Resources
+    </a>
   </div>
 </header>
 
@@ -317,10 +387,24 @@
 </div>
 
 <footer>
-  <p class="footer-text">
-    Ghana FX Tracker is a <a href="https://labarijournal.com">Labari</a> resource. Data from Bank of Ghana and publicly available bank rate sheets.<br>
-    Rates are indicative and updated on business days. Not financial advice. · <a href="https://labarijournal.com">Labari Journal</a> · <a href="https://techlabari.com">TechLabari</a>
-  </p>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">L</div>
+      <div>
+        <div class="footer-brand-name">Labari Media</div>
+        <div class="footer-brand-sub">Ghana FX Tracker is a Labari Media resource</div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="https://labarijournal.com">Labari Journal</a>
+      <a href="https://techlabari.com">Tech Labari</a>
+      <a href="#">Resources</a>
+    </div>
+    <div class="footer-bottom">
+      <span>Data sourced from Bank of Ghana and publicly available bank rate sheets. Rates are indicative. Not financial advice.</span>
+      <span class="footer-copy">© 2026 Labari Media. All rights reserved.</span>
+    </div>
+  </div>
 </footer>
 
 <script>
