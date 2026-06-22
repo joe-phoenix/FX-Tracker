@@ -425,30 +425,31 @@ function promptApiUrl() {
 document.getElementById('apiUrlDisplay').textContent = API_BASE;
 
 // ─── BANK LOGO DOMAINS ───────────────────────────────────────────────────────
+// Verified official domains for all 23 banks (June 2026)
 const BANK_DOMAINS = {
-  gcb:      'gcbbank.com.gh',
-  absa:     'absa.com.gh',
-  ecobank:  'ecobank.com',
-  stanbic:  'stanbicbank.com.gh',
-  scb:      'sc.com',
-  fidelity: 'fidelitybank.com.gh',
-  access:   'accessbankghana.com',
-  republic: 'republicghana.com',
-  socgen:   'societegenerale.com.gh',
-  zenith:   'zenithbank.com.gh',
-  uba:      'ubaghana.com',
-  calbank:  'calbank.net',
-  adb:      'adbghana.com',
-  boagh:    'bankofafrica.com',
-  cbg:      'cbg.com.gh',
-  fbnbank:  'fbnbankghana.com',
-  fab:      'firstatlanticbank.com.gh',
-  fnb:      'fnbghana.com',
-  gtbank:   'gtbank.com.gh',
-  nib:      'nibghana.com',
-  omnibsic: 'omnibsicbank.com',
-  pru:      'prudentialbank.com.gh',
-  umb:      'umbghana.com',
+  gcb:      'gcbbank.com.gh',           // ✅ confirmed
+  absa:     'absa.com.gh',              // ✅ confirmed
+  stanbic:  'stanbicbank.com.gh',       // ✅ confirmed
+  fnb:      'firstnationalbank.com.gh', // ✅ confirmed (not fnbghana.com)
+  adb:      'agricbank.com',            // ✅ confirmed (not adbghana.com)
+  socgen:   'societegenerale.com.gh',   // ✅ confirmed
+  scb:      'sc.com',                   // ✅ confirmed
+  fidelity: 'fidelitybank.com.gh',      // ✅ confirmed
+  ecobank:  'ecobank.com',              // ✅ confirmed
+  access:   'accessbankghana.com',      // ✅ confirmed
+  republic: 'republicghana.com',        // ✅ confirmed
+  calbank:  'calbank.net',              // ✅ confirmed
+  boagh:    'bankofafrica.com.gh',      // ✅ confirmed (not bankofafrica.com)
+  cbg:      'cbg.com.gh',              // ✅ confirmed
+  fbnbank:  'fbnbankghana.com',         // ✅ confirmed
+  fab:      'firstatlanticbank.com.gh', // ✅ confirmed
+  gtbank:   'gtbghana.com',            // ✅ confirmed (not gtbank.com.gh)
+  nib:      'nibghana.com',            // confirmed
+  omnibsic: 'omnibsicbank.com',        // confirmed
+  pru:      'prudentialbank.com.gh',    // confirmed
+  uba:      'ubaghana.com',            // confirmed
+  umb:      'umbghana.com',            // confirmed
+  zenith:   'zenithbank.com.gh',        // confirmed
 };
 
 function bankLogoUrl(bankId) {
