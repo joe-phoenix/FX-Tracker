@@ -4,11 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230D2B1F'/><text y='72' x='50' text-anchor='middle' font-size='60'>💱</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230D2B1F'/><text y='72' x='50' text-anchor='middle' font-size='60'>💱</text></svg>">
+<meta name="theme-color" content="#0D2B1F">
+
 <!-- Primary SEO -->
-<title>Ghana FX Tracker — Compare Bank Exchange Rates | Labari Media</title>
-<meta name="description" content="Compare live USD, GBP and EUR exchange rates across all 23 commercial banks in Ghana, including Bank of Ghana interbank rates. Updated daily. A Labari Media resource.">
-<meta name="keywords" content="Ghana exchange rates, Ghana forex rates, dollar rate Ghana, GHS USD, cedi to dollar, bank exchange rates Ghana, Bank of Ghana rate, GCB exchange rate, Absa Ghana forex, Ecobank Ghana rate, Fidelity Bank rate, compare bank rates Ghana">
-<meta name="author" content="Labari Media">
+<title>Ghana FX Tracker — Compare Bank Exchange Rates | Labari Data Desk</title>
+<meta name="description" content="Compare live USD, GBP and EUR exchange rates across all 23 commercial banks in Ghana, including Bank of Ghana interbank rates. Updated daily. A Labari Data Desk resource.">
+<meta name="keywords" content="Ghana exchange rates, Ghana forex rates, dollar rate Ghana, GHS USD, cedi to dollar, bank exchange rates Ghana, Bank of Ghana rate, GCB exchange rate, Absa Ghana forex, Ecobank Ghana rate, Fidelity Bank rate, compare bank rates Ghana, Labari Data Desk, Ghana FX tracker, cedi exchange rate today, forex Ghana 2026, USD GHS rate today, pound rate Ghana, euro rate Ghana">
+<meta name="author" content="Labari Data Desk">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://joe-phoenix.github.io/FX-Tracker/">
 
@@ -17,7 +21,7 @@
 <meta property="og:url" content="https://joe-phoenix.github.io/FX-Tracker/">
 <meta property="og:title" content="Ghana FX Tracker — Compare Bank Exchange Rates">
 <meta property="og:description" content="Live USD, GBP and EUR exchange rates from all 23 banks in Ghana. Compare buying and selling rates side by side. A Labari Media resource.">
-<meta property="og:site_name" content="Labari Media">
+<meta property="og:site_name" content="Labari Data Desk">
 <meta property="og:locale" content="en_GH">
 
 <!-- Twitter Card -->
@@ -230,7 +234,7 @@
       <div class="labari-logo">L</div>
       <span class="labari-name">Labari Data Desk</span>
     </a>
-    <a href="#" class="resources-nav">
+    <a href="https://datadesk.labarijournal.com" class="resources-nav">
       <span class="resources-nav-arrow">←</span> Labari Data Desk
     </a>
   </div>
@@ -297,6 +301,46 @@
   </div>
 </div>
 
+<div class="convert-section">
+  <div class="convert-card">
+    <div class="convert-title">Currency Converter</div>
+    <div class="convert-grid">
+      <div class="convert-field">
+        <label>Amount</label>
+        <input type="number" id="convertAmount" value="100" min="0" oninput="updateConvert()">
+      </div>
+      <div>
+        <button class="swap-btn" onclick="swapDirection()" title="Swap direction">⇄</button>
+      </div>
+      <div class="convert-field">
+        <label>Direction</label>
+        <select id="convertDir" onchange="updateConvert()">
+          <option value="buy">USD → GHS (I'm buying USD)</option>
+          <option value="sell">GHS → USD (I'm selling USD)</option>
+        </select>
+      </div>
+      <div class="convert-field">
+        <label>Bank</label>
+        <select id="convertBank" onchange="updateConvert()">
+          <option value="">Select a bank</option>
+        </select>
+      </div>
+    </div>
+    <div class="convert-result" id="convertResult" style="display:none;">
+      <div>
+        <div class="convert-result-label" id="convertResultLabel">You receive</div>
+        <div class="convert-result-val" id="convertResultVal">—</div>
+        <div class="convert-result-bank" id="convertResultBank">—</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="convert-result-label">Rate used</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--white);margin-top:4px;" id="convertRateUsed">—</div>
+      </div>
+    </div>
+    <p class="convert-note">Indicative only. Bank fees, commissions, and minimum amounts not included. Always confirm before transacting.</p>
+  </div>
+</div>
+
 <div class="banks-section">
   <div class="section-header">
     <div class="section-title">All Banks</div>
@@ -348,46 +392,6 @@
   </p>
 </div>
 
-<div class="convert-section">
-  <div class="convert-card">
-    <div class="convert-title">Currency Converter</div>
-    <div class="convert-grid">
-      <div class="convert-field">
-        <label>Amount</label>
-        <input type="number" id="convertAmount" value="100" min="0" oninput="updateConvert()">
-      </div>
-      <div>
-        <button class="swap-btn" onclick="swapDirection()" title="Swap direction">⇄</button>
-      </div>
-      <div class="convert-field">
-        <label>Direction</label>
-        <select id="convertDir" onchange="updateConvert()">
-          <option value="buy">USD → GHS (I'm buying USD)</option>
-          <option value="sell">GHS → USD (I'm selling USD)</option>
-        </select>
-      </div>
-      <div class="convert-field">
-        <label>Bank</label>
-        <select id="convertBank" onchange="updateConvert()">
-          <option value="">Select a bank</option>
-        </select>
-      </div>
-    </div>
-    <div class="convert-result" id="convertResult" style="display:none;">
-      <div>
-        <div class="convert-result-label" id="convertResultLabel">You receive</div>
-        <div class="convert-result-val" id="convertResultVal">—</div>
-        <div class="convert-result-bank" id="convertResultBank">—</div>
-      </div>
-      <div style="text-align:right;">
-        <div class="convert-result-label">Rate used</div>
-        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--white);margin-top:4px;" id="convertRateUsed">—</div>
-      </div>
-    </div>
-    <p class="convert-note">Indicative only. Bank fees, commissions, and minimum amounts not included. Always confirm before transacting.</p>
-  </div>
-</div>
-
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -400,7 +404,7 @@
     <div class="footer-links">
       <a href="https://labarijournal.com">Labari Journal</a>
       <a href="https://techlabari.com">Tech Labari</a>
-      <a href="#">Resources</a>
+      <a href="https://datadesk.labarijournal.com">Data Desk</a>
     </div>
     <div class="footer-bottom">
       <span>Data sourced from Bank of Ghana and publicly available bank rate sheets. Rates are indicative. Not financial advice.</span>
