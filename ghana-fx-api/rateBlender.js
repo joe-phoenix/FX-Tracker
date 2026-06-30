@@ -22,7 +22,6 @@ const BANK_PREMIUMS = {
   adb:      { premiumPct: 0.6,  spreadPct: 1.2 },
   absa:     { premiumPct: 1.2,  spreadPct: 2.8 },
   stanbic:  { premiumPct: 1.3,  spreadPct: 3.0 },
-  socgen:   { premiumPct: 1.2,  spreadPct: 2.9 },
   fnb:      { premiumPct: 1.3,  spreadPct: 3.1 },
   gcb:      { premiumPct: 0.8,  spreadPct: 1.4 },
   scb:      { premiumPct: 1.5,  spreadPct: 3.2 },
