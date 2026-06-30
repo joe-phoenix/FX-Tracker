@@ -1,8 +1,8 @@
 /**
- * Commercial Bank Scrapers — 9 banks with verified, real data sources
+ * Commercial Bank Scrapers — 8 banks with verified, real data sources
  *
  * SCOPE: Only banks with a confirmed public rate page/PDF are included.
- * The other 14 BoG-licensed commercial banks were removed because no
+ * The other 15 BoG-licensed commercial banks were removed because no
  * public rate page could be found for them — there is no honest way to
  * source their rates, so they are excluded rather than estimated.
  *
@@ -17,10 +17,6 @@
  *
  * Stanbic   → stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf
  *             ✅ PDF confirmed live (19 Jun 2026)
- *
- * SocGen    → societegenerale.com.gh/en/your-bank/foreign-exchange-rates/
- *             ✅ Rates confirmed in homepage/page snippet (JS-rendered widget)
- *             USD 11.00/11.50, EUR 12.54/13.11, GBP 14.53/15.20 (26 Jun 2026)
  *
  * FNB       → firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html
  *             ✅ Page confirmed accessible. Rates confirmed in image:
@@ -195,38 +191,6 @@ async function scrapeStanbic() {
 }
 
 /**
- * Société Générale Ghana — JS widget, confirmed rates exist
- */
-async function scrapeSocGen() {
-  try {
-    await new Promise(r => setTimeout(r, 1500));
-    const res = await HTTP.get('https://societegenerale.com.gh/en/your-bank/foreign-exchange-rates/', {
-      timeout: 12000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Referer': 'https://societegenerale.com.gh/en/',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      },
-    });
-    const $ = cheerio.load(res.data);
-    const rates = parseRatesFromTable($);
-    if (rates) return { rates };
-
-    const pageText = $('body').text();
-    const usdMatch = pageText.match(/USD[^0-9]*([\d.]+)[^0-9]+([\d.]+)/);
-    const gbpMatch = pageText.match(/GBP[^0-9]*([\d.]+)[^0-9]+([\d.]+)/);
-    const eurMatch = pageText.match(/EUR[^0-9]*([\d.]+)[^0-9]+([\d.]+)/);
-
-    const textRates = {};
-    if (usdMatch) textRates['USD'] = { buying: parseFloat(usdMatch[1]), selling: parseFloat(usdMatch[2]) };
-    if (gbpMatch) textRates['GBP'] = { buying: parseFloat(gbpMatch[1]), selling: parseFloat(gbpMatch[2]) };
-    if (eurMatch) textRates['EUR'] = { buying: parseFloat(eurMatch[1]), selling: parseFloat(eurMatch[2]) };
-
-    return Object.keys(textRates).length > 0 ? { rates: textRates } : null;
-  } catch { return null; }
-}
-
-/**
  * First National Bank (FNB) Ghana — JS widget, confirmed rates exist
  */
 async function scrapeFNB() {
@@ -306,12 +270,6 @@ const BANK_SCRAPERS = [
     scrape: scrapeStanbic,
     url: 'https://www.stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf',
     scrapeStatus: 'pdf-confirmed',
-  },
-  {
-    id: 'socgen', name: 'Société Générale Ghana', shortName: 'SGA', type: 'International', color: '#CC0000',
-    scrape: scrapeSocGen,
-    url: 'https://societegenerale.com.gh/en/your-bank/foreign-exchange-rates/',
-    scrapeStatus: 'js-widget',
   },
   {
     id: 'fnb', name: 'First National Bank', shortName: 'FNB', type: 'International', color: '#C0392B',
