@@ -1,13 +1,13 @@
 /**
  * Rate Blending & Estimation
  *
- * For banks without scrapeable pages, estimates rates using:
+ * Applies only to the 9 banks in the registry, and only as a fallback
+ * when a live scrape fails (e.g. JS-gated page didn't render).
+ *
  *   bank_mid   = BoG_mid × (1 + premiumPct / 100)
  *   half_spread = bank_mid × spreadPct / 200
  *   buying     = bank_mid − half_spread
  *   selling    = bank_mid + half_spread
- *
- * Premium and spread values are tuned per-bank from historical rate sheet observations.
  */
 
 const SPREAD_PROFILES = {
@@ -17,31 +17,17 @@ const SPREAD_PROFILES = {
   'Pan-African':   { premiumPct: 1.1,  spreadPct: 2.4 },
 };
 
-// Per-bank tuning based on historical public rate sheet observations
+// Per-bank tuning for the 9 banks actually in the registry
 const BANK_PREMIUMS = {
-  gcb:      { premiumPct: 0.8,  spreadPct: 1.4 },
+  adb:      { premiumPct: 0.6,  spreadPct: 1.2 },
   absa:     { premiumPct: 1.2,  spreadPct: 2.8 },
-  ecobank:  { premiumPct: 1.0,  spreadPct: 2.2 },
   stanbic:  { premiumPct: 1.3,  spreadPct: 3.0 },
+  socgen:   { premiumPct: 1.2,  spreadPct: 2.9 },
+  fnb:      { premiumPct: 1.3,  spreadPct: 3.1 },
+  gcb:      { premiumPct: 0.8,  spreadPct: 1.4 },
   scb:      { premiumPct: 1.5,  spreadPct: 3.2 },
   fidelity: { premiumPct: 0.9,  spreadPct: 1.8 },
-  access:   { premiumPct: 1.1,  spreadPct: 2.5 },
-  republic: { premiumPct: 1.0,  spreadPct: 2.0 },
-  socgen:   { premiumPct: 1.2,  spreadPct: 2.9 },
-  zenith:   { premiumPct: 1.1,  spreadPct: 2.4 },
-  uba:      { premiumPct: 1.1,  spreadPct: 2.3 },
-  calbank:  { premiumPct: 1.1,  spreadPct: 2.3 },
-  adb:      { premiumPct: 0.6,  spreadPct: 1.2 },  // ADB state-owned, tightest spread
-  boagh:    { premiumPct: 1.1,  spreadPct: 2.4 },
-  cbg:      { premiumPct: 0.7,  spreadPct: 1.3 },  // State-owned, tight
-  fbnbank:  { premiumPct: 1.1,  spreadPct: 2.3 },
-  fab:      { premiumPct: 1.0,  spreadPct: 2.0 },
-  fnb:      { premiumPct: 1.3,  spreadPct: 3.1 },  // FNB/FirstRand — international
-  gtbank:   { premiumPct: 1.0,  spreadPct: 2.1 },
-  nib:      { premiumPct: 0.7,  spreadPct: 1.4 },  // NIB state-owned
-  omnibsic: { premiumPct: 1.0,  spreadPct: 2.1 },
-  pru:      { premiumPct: 1.0,  spreadPct: 2.0 },
-  umb:      { premiumPct: 1.0,  spreadPct: 2.2 },
+  ecobank:  { premiumPct: 1.0,  spreadPct: 2.2 },
 };
 
 function estimateRates(bankId, bankType, bogMid) {
