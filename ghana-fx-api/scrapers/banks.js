@@ -1,31 +1,47 @@
 /**
- * Commercial Bank Scrapers — all 23 BoG-licensed commercial banks
+ * Commercial Bank Scrapers — 9 banks with verified, real data sources
+ *
+ * SCOPE: Only banks with a confirmed public rate page/PDF are included.
+ * The other 14 BoG-licensed commercial banks were removed because no
+ * public rate page could be found for them — there is no honest way to
+ * source their rates, so they are excluded rather than estimated.
  *
  * VERIFIED DATA SOURCES (researched June 2026):
  * ─────────────────────────────────────────────────────────────────
  * ADB       → agricbank.com/customer-care/financials/current-rates/
  *             ✅ Clean WordPress HTML table. Confirmed live data:
  *             USD 10.90/11.40, GBP 14.50/15.10, EUR 12.40/13.05 (28 Jun 2026)
- *             Table cols: Currency | Code | Transfer Buying | Transfer Selling | Cash Buying | Cash Selling
- *             We use Transfer/Offshore rates (more standard for comparison)
- *
- * SocGen    → societegenerale.com.gh/en/your-bank/foreign-exchange-rates/
- *             ✅ Rates confirmed in homepage search snippet (JS widget on homepage)
- *             USD 11.00/11.50, EUR 12.54/13.11, GBP 14.53/15.20 (26 Jun 2026)
- *             Dedicated rates page is the canonical scrape target
- *
- * FNB       → firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html
- *             ✅ Page confirmed accessible. Rates are JS-rendered (React/Angular widget)
- *             USD 11.00/11.50, EUR 12.54/13.11, GBP 14.53/15.20 confirmed in image
  *
  * Absa      → absa.com.gh/content/dam/ghana/absa/pdf/daily-rates.pdf
- *             ✅ Public PDF confirmed live (robots.txt disallows but PDF is public)
- *
- * GCB       → gcbbank.com.gh/87-exchange/447-foreign-exchange
- *             ⚠ JS-gated (Cloudflare). Rates confirmed in cache snippets.
+ *             ✅ Public PDF confirmed live
  *
  * Stanbic   → stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf
  *             ✅ PDF confirmed live (19 Jun 2026)
+ *
+ * SocGen    → societegenerale.com.gh/en/your-bank/foreign-exchange-rates/
+ *             ✅ Rates confirmed in homepage/page snippet (JS-rendered widget)
+ *             USD 11.00/11.50, EUR 12.54/13.11, GBP 14.53/15.20 (26 Jun 2026)
+ *
+ * FNB       → firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html
+ *             ✅ Page confirmed accessible. Rates confirmed in image:
+ *             USD 11.00/11.50, GBP 14.53/15.20, EUR 12.54/13.11 (29 Jun 2026)
+ *
+ * GCB       → gcbbank.com.gh/87-exchange/447-foreign-exchange
+ *             ⚠ JS-gated (Cloudflare). Rates confirmed to exist in cache.
+ *
+ * Standard Chartered → sc.com/gh/forex-rates/
+ *             ⚠ JS-gated page, rates page confirmed to exist
+ *
+ * Fidelity  → fidelitybank.com.gh/rates
+ *             ⚠ JS-gated page, rates page confirmed to exist
+ *
+ * Ecobank   → ecobank.com/gh/personal-banking/foreign-exchange
+ *             ⚠ Page exists, no machine-readable table found yet
+ *
+ * For the ⚠ banks: the page is real and does carry rates, but automated
+ * scraping is unreliable (client-side rendering or bot protection). They
+ * fall back to BoG-mid-based estimation only when the live scrape fails,
+ * and are clearly flagged "estimated" in the API response.
  */
 
 const axios   = require('axios');
@@ -96,7 +112,7 @@ function parsePdfBuffer(buffer) {
   ];
 
   for (const { code, regex } of patterns) {
-    if (rates[code]) continue; // already found
+    if (rates[code]) continue;
     const m = text.match(regex);
     if (m) {
       const a = parseFloat(m[1]), b = parseFloat(m[2]);
@@ -112,10 +128,7 @@ function parsePdfBuffer(buffer) {
 // ─── Individual bank scrapers ─────────────────────────────────────
 
 /**
- * ADB — agricbank.com/customer-care/financials/current-rates/
- * ✅ Clean WordPress HTML table confirmed live 28 Jun 2026
- * Table has 6 columns: Currency | Code | Transfer Buy | Transfer Sell | Cash Buy | Cash Sell
- * We use Transfer/Offshore rates (columns 3 & 4) as they're the standard interbank rates
+ * ADB — confirmed clean HTML table
  */
 async function scrapeADB() {
   try {
@@ -129,27 +142,22 @@ async function scrapeADB() {
 
       const rowText = $(row).text().toUpperCase();
       let code = null;
-      if      (rowText.includes('US DOLLAR'))        code = 'USD';
-      else if (rowText.includes('POUND'))             code = 'GBP';
-      else if (rowText.includes('EURO'))              code = 'EUR';
-      else if (rowText.includes('SWISS'))             code = 'CHF';
-      else if (rowText.includes('CANADIAN'))          code = 'CAD';
-      else if (rowText.includes('YEN'))               code = 'JPY';
+      if      (rowText.includes('US DOLLAR'))  code = 'USD';
+      else if (rowText.includes('POUND'))      code = 'GBP';
+      else if (rowText.includes('EURO'))       code = 'EUR';
+      else if (rowText.includes('SWISS'))      code = 'CHF';
+      else if (rowText.includes('CANADIAN'))   code = 'CAD';
+      else if (rowText.includes('YEN'))        code = 'JPY';
       else return;
 
-      // Columns: [Currency, Code, Transfer Buy, Transfer Sell, Cash Buy, Cash Sell]
       const allNums = [];
       cells.each((_, cell) => {
         const val = parseFloat($(cell).text().trim().replace(/,/g, ''));
         if (!isNaN(val) && val > 1) allNums.push(val);
       });
 
-      // First two valid numbers are Transfer Buy and Transfer Sell
       if (allNums.length >= 2) {
-        rates[code] = {
-          buying:  allNums[0],
-          selling: allNums[1],
-        };
+        rates[code] = { buying: allNums[0], selling: allNums[1] };
       }
     });
 
@@ -158,10 +166,36 @@ async function scrapeADB() {
 }
 
 /**
- * Société Générale Ghana
- * ✅ Dedicated rates page: societegenerale.com.gh/en/your-bank/foreign-exchange-rates/
- * Rates confirmed: USD 11.00/11.50, EUR 12.54/13.11, GBP 14.53/15.20 (26 Jun 2026)
- * Page uses a JS widget — attempt fetch with polite delay; fall back to estimation
+ * Absa Ghana — public PDF
+ */
+async function scrapeAbsa() {
+  try {
+    const res = await HTTP.get('https://www.absa.com.gh/content/dam/ghana/absa/pdf/daily-rates.pdf', {
+      responseType: 'arraybuffer',
+      timeout: 12000,
+      headers: { 'Accept': 'application/pdf,*/*' },
+    });
+    const rates = parsePdfBuffer(res.data);
+    return rates ? { rates } : null;
+  } catch { return null; }
+}
+
+/**
+ * Stanbic Bank Ghana — public PDF
+ */
+async function scrapeStanbic() {
+  try {
+    const res = await HTTP.get(
+      'https://www.stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf',
+      { responseType: 'arraybuffer', timeout: 12000, headers: { 'Accept': 'application/pdf,*/*' } }
+    );
+    const rates = parsePdfBuffer(res.data);
+    return rates ? { rates } : null;
+  } catch { return null; }
+}
+
+/**
+ * Société Générale Ghana — JS widget, confirmed rates exist
  */
 async function scrapeSocGen() {
   try {
@@ -175,12 +209,9 @@ async function scrapeSocGen() {
       },
     });
     const $ = cheerio.load(res.data);
-
-    // SocGen renders a table or definition list with currency code + buy/sell
     const rates = parseRatesFromTable($);
     if (rates) return { rates };
 
-    // Fallback: scan for patterns like "USD" near numbers in the page text
     const pageText = $('body').text();
     const usdMatch = pageText.match(/USD[^0-9]*([\d.]+)[^0-9]+([\d.]+)/);
     const gbpMatch = pageText.match(/GBP[^0-9]*([\d.]+)[^0-9]+([\d.]+)/);
@@ -196,10 +227,7 @@ async function scrapeSocGen() {
 }
 
 /**
- * First National Bank (FNB) Ghana
- * ✅ firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html
- * Rates confirmed: USD 11.00/11.50, GBP 14.53/15.20, EUR 12.54/13.11 (29 Jun 2026)
- * Rates rendered by JS widget — page structure fetched, values injected client-side
+ * First National Bank (FNB) Ghana — JS widget, confirmed rates exist
  */
 async function scrapeFNB() {
   try {
@@ -211,40 +239,7 @@ async function scrapeFNB() {
 }
 
 /**
- * Absa Ghana
- * ✅ absa.com.gh/content/dam/ghana/absa/pdf/daily-rates.pdf
- * Public PDF, updated daily
- */
-async function scrapeAbsa() {
-  try {
-    const res = await HTTP.get('https://www.absa.com.gh/content/dam/ghana/absa/pdf/daily-rates.pdf', {
-      responseType: 'arraybuffer',
-      timeout: 12000,
-      headers: { 'Accept': 'application/pdf,*/*' },
-    });
-    const rates = parsePdfBuffer(res.data);
-    return rates ? { rates } : null;
-  } catch { return null; }
-}
-
-/**
- * Stanbic Bank Ghana
- * ✅ PDF confirmed live 19 Jun 2026
- */
-async function scrapeStanbic() {
-  try {
-    const res = await HTTP.get(
-      'https://www.stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf',
-      { responseType: 'arraybuffer', timeout: 12000, headers: { 'Accept': 'application/pdf,*/*' } }
-    );
-    const rates = parsePdfBuffer(res.data);
-    return rates ? { rates } : null;
-  } catch { return null; }
-}
-
-/**
- * GCB Bank
- * ⚠ JS-gated page. Attempt fetch; usually returns empty shell.
+ * GCB Bank — JS-gated (Cloudflare)
  */
 async function scrapeGCB() {
   try {
@@ -281,7 +276,7 @@ async function scrapeFidelity() {
 }
 
 /**
- * Ecobank Ghana — no machine-readable rate table found
+ * Ecobank Ghana — page exists, no machine-readable table found yet
  */
 async function scrapeEcobank() {
   try {
@@ -292,45 +287,43 @@ async function scrapeEcobank() {
   } catch { return null; }
 }
 
-// ─── Full 23-bank registry ────────────────────────────────────────
+// ─── 9-bank registry — all with confirmed real data sources ──────
 const BANK_SCRAPERS = [
-
-  // ── Confirmed live data sources ──
   {
     id: 'adb', name: 'Agricultural Dev. Bank', shortName: 'ADB', type: 'State-owned', color: '#196F3D',
     scrape: scrapeADB,
     url: 'https://agricbank.com/customer-care/financials/current-rates/',
-    scrapeStatus: 'html-confirmed', // ✅ Clean HTML table, live 28 Jun 2026
-  },
-  {
-    id: 'socgen', name: 'Société Générale Ghana', shortName: 'SGA', type: 'International', color: '#CC0000',
-    scrape: scrapeSocGen,
-    url: 'https://societegenerale.com.gh/en/your-bank/foreign-exchange-rates/',
-    scrapeStatus: 'js-widget', // ✅ Rates confirmed, JS-rendered widget
-  },
-  {
-    id: 'fnb', name: 'First National Bank', shortName: 'FNB', type: 'International', color: '#C0392B',
-    scrape: scrapeFNB,
-    url: 'https://www.firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html',
-    scrapeStatus: 'js-widget', // ✅ Rates confirmed, JS-rendered widget
+    scrapeStatus: 'html-confirmed',
   },
   {
     id: 'absa', name: 'Absa Ghana', shortName: 'ABS', type: 'International', color: '#B22222',
     scrape: scrapeAbsa,
     url: 'https://www.absa.com.gh/content/dam/ghana/absa/pdf/daily-rates.pdf',
-    scrapeStatus: 'pdf-confirmed', // ✅ Public PDF confirmed live
+    scrapeStatus: 'pdf-confirmed',
   },
   {
     id: 'stanbic', name: 'Stanbic Bank', shortName: 'STB', type: 'International', color: '#1F618D',
     scrape: scrapeStanbic,
     url: 'https://www.stanbicbank.com.gh/static_file/ghana/Downloadable%20Files/Rates/Daily_Forex_Rates.pdf',
-    scrapeStatus: 'pdf-confirmed', // ✅ PDF confirmed live 19 Jun 2026
+    scrapeStatus: 'pdf-confirmed',
+  },
+  {
+    id: 'socgen', name: 'Société Générale Ghana', shortName: 'SGA', type: 'International', color: '#CC0000',
+    scrape: scrapeSocGen,
+    url: 'https://societegenerale.com.gh/en/your-bank/foreign-exchange-rates/',
+    scrapeStatus: 'js-widget',
+  },
+  {
+    id: 'fnb', name: 'First National Bank', shortName: 'FNB', type: 'International', color: '#C0392B',
+    scrape: scrapeFNB,
+    url: 'https://www.firstnationalbank.com.gh/rates-pricing/foreignExchangeRates.html',
+    scrapeStatus: 'js-widget',
   },
   {
     id: 'gcb', name: 'GCB Bank', shortName: 'GCB', type: 'State-owned', color: '#1A5276',
     scrape: scrapeGCB,
     url: 'https://www.gcbbank.com.gh/87-exchange/447-foreign-exchange',
-    scrapeStatus: 'js-gated', // ⚠ Cloudflare JS challenge
+    scrapeStatus: 'js-gated',
   },
   {
     id: 'scb', name: 'Standard Chartered', shortName: 'SCB', type: 'International', color: '#00529B',
@@ -350,22 +343,6 @@ const BANK_SCRAPERS = [
     url: 'https://ecobank.com/gh/personal-banking/foreign-exchange',
     scrapeStatus: 'no-rate-table',
   },
-
-  // ── Estimate-only ──
-  { id: 'access',   name: 'Access Bank Ghana',        shortName: 'ACC', type: 'Pan-African',   color: '#E74C3C', scrape: null, url: 'https://www.accessbankghana.com',           scrapeStatus: 'no-rate-page' },
-  { id: 'republic', name: 'Republic Bank Ghana',      shortName: 'REP', type: 'Commercial',    color: '#117A65', scrape: null, url: 'https://www.republicghana.com',             scrapeStatus: 'no-rate-page' },
-  { id: 'calbank',  name: 'CalBank',                  shortName: 'CAL', type: 'Commercial',    color: '#884EA0', scrape: null, url: 'https://www.calbank.net',                   scrapeStatus: 'no-rate-page' },
-  { id: 'boagh',    name: 'Bank of Africa Ghana',     shortName: 'BOA', type: 'Pan-African',   color: '#00539C', scrape: null, url: 'https://www.bankofafrica.com.gh',           scrapeStatus: 'no-rate-page' },
-  { id: 'cbg',      name: 'Consolidated Bank Ghana',  shortName: 'CBG', type: 'State-owned',   color: '#CA6F1E', scrape: null, url: 'https://www.cbg.com.gh',                   scrapeStatus: 'no-rate-page' },
-  { id: 'fbnbank',  name: 'FBNBank Ghana',            shortName: 'FBN', type: 'Commercial',    color: '#1C4E80', scrape: null, url: 'https://www.fbnbankghana.com',              scrapeStatus: 'no-rate-page' },
-  { id: 'fab',      name: 'First Atlantic Bank',      shortName: 'FAB', type: 'Commercial',    color: '#148F77', scrape: null, url: 'https://www.firstatlanticbank.com.gh',      scrapeStatus: 'no-rate-page' },
-  { id: 'gtbank',   name: 'GTBank Ghana',             shortName: 'GTB', type: 'Commercial',    color: '#F39C12', scrape: null, url: 'https://www.gtbghana.com',                  scrapeStatus: 'no-rate-page' },
-  { id: 'nib',      name: 'National Investment Bank', shortName: 'NIB', type: 'State-owned',   color: '#1A6B4A', scrape: null, url: 'https://www.nibghana.com',                  scrapeStatus: 'no-rate-page' },
-  { id: 'omnibsic', name: 'OmniBSIC Bank',            shortName: 'OMN', type: 'Commercial',    color: '#2E4057', scrape: null, url: 'https://www.omnibsicbank.com',              scrapeStatus: 'no-rate-page' },
-  { id: 'pru',      name: 'Prudential Bank',          shortName: 'PRU', type: 'Commercial',    color: '#5D6D7E', scrape: null, url: 'https://www.prudentialbank.com.gh',         scrapeStatus: 'no-rate-page' },
-  { id: 'uba',      name: 'UBA Ghana',                shortName: 'UBA', type: 'Pan-African',   color: '#A93226', scrape: null, url: 'https://www.ubaghana.com',                  scrapeStatus: 'no-rate-page' },
-  { id: 'umb',      name: 'Universal Merchant Bank',  shortName: 'UMB', type: 'Commercial',    color: '#6E2F8B', scrape: null, url: 'https://www.umbghana.com',                  scrapeStatus: 'no-rate-page' },
-  { id: 'zenith',   name: 'Zenith Bank Ghana',        shortName: 'ZEN', type: 'Commercial',    color: '#4A235A', scrape: null, url: 'https://www.zenithbank.com.gh',             scrapeStatus: 'no-rate-page' },
 ];
 
 async function scrapeAllBanks() {
