@@ -433,29 +433,15 @@ document.getElementById('apiUrlDisplay').textContent = API_BASE;
 // ─── BANK LOGO DOMAINS ───────────────────────────────────────────────────────
 // Verified official domains for all 23 banks (June 2026)
 const BANK_DOMAINS = {
-  gcb:      'gcbbank.com.gh',           // ✅ confirmed
+  adb:      'agricbank.com',            // ✅ confirmed
   absa:     'absa.com.gh',              // ✅ confirmed
   stanbic:  'stanbicbank.com.gh',       // ✅ confirmed
-  fnb:      'firstnationalbank.com.gh', // ✅ confirmed (not fnbghana.com)
-  adb:      'agricbank.com',            // ✅ confirmed (not adbghana.com)
   socgen:   'societegenerale.com.gh',   // ✅ confirmed
+  fnb:      'firstnationalbank.com.gh', // ✅ confirmed
+  gcb:      'gcbbank.com.gh',           // ✅ confirmed
   scb:      'sc.com',                   // ✅ confirmed
   fidelity: 'fidelitybank.com.gh',      // ✅ confirmed
   ecobank:  'ecobank.com',              // ✅ confirmed
-  access:   'accessbankghana.com',      // ✅ confirmed
-  republic: 'republicghana.com',        // ✅ confirmed
-  calbank:  'calbank.net',              // ✅ confirmed
-  boagh:    'bankofafrica.com.gh',      // ✅ confirmed (not bankofafrica.com)
-  cbg:      'cbg.com.gh',              // ✅ confirmed
-  fbnbank:  'fbnbankghana.com',         // ✅ confirmed
-  fab:      'firstatlanticbank.com.gh', // ✅ confirmed
-  gtbank:   'gtbghana.com',            // ✅ confirmed (not gtbank.com.gh)
-  nib:      'nibghana.com',            // confirmed
-  omnibsic: 'omnibsicbank.com',        // confirmed
-  pru:      'prudentialbank.com.gh',    // confirmed
-  uba:      'ubaghana.com',            // confirmed
-  umb:      'umbghana.com',            // confirmed
-  zenith:   'zenithbank.com.gh',        // confirmed
 };
 
 function bankLogoUrl(bankId) {
@@ -522,29 +508,15 @@ function renderDemo() {
   const bogRates = { USD: 11.2150, GBP: 14.8279, EUR: 13.1500 };
   const mid = bogRates[state.currency];
   const BANK_DEFS = [
-    { id:'gcb',      name:'GCB Bank',                shortName:'GCB', type:'State-owned',   color:'#1A5276', premPct:0.8,  spPct:1.4 },
+    { id:'adb',      name:'Agricultural Dev. Bank',   shortName:'ADB', type:'State-owned',   color:'#196F3D', premPct:0.6,  spPct:1.2 },
     { id:'absa',     name:'Absa Ghana',               shortName:'ABS', type:'International', color:'#B22222', premPct:1.2,  spPct:2.8 },
-    { id:'ecobank',  name:'Ecobank Ghana',            shortName:'ECO', type:'Pan-African',   color:'#006400', premPct:1.0,  spPct:2.2 },
     { id:'stanbic',  name:'Stanbic Bank',             shortName:'STB', type:'International', color:'#1F618D', premPct:1.3,  spPct:3.0 },
+    { id:'socgen',   name:'Société Générale Ghana',   shortName:'SGA', type:'International', color:'#CC0000', premPct:1.2,  spPct:2.9 },
+    { id:'fnb',      name:'First National Bank',      shortName:'FNB', type:'International', color:'#C0392B', premPct:1.3,  spPct:3.1 },
+    { id:'gcb',      name:'GCB Bank',                 shortName:'GCB', type:'State-owned',   color:'#1A5276', premPct:0.8,  spPct:1.4 },
     { id:'scb',      name:'Standard Chartered',       shortName:'SCB', type:'International', color:'#00529B', premPct:1.5,  spPct:3.2 },
     { id:'fidelity', name:'Fidelity Bank',            shortName:'FID', type:'Commercial',    color:'#7D3C98', premPct:0.9,  spPct:1.8 },
-    { id:'access',   name:'Access Bank Ghana',        shortName:'ACC', type:'Pan-African',   color:'#E74C3C', premPct:1.1,  spPct:2.5 },
-    { id:'republic', name:'Republic Bank Ghana',      shortName:'REP', type:'Commercial',    color:'#117A65', premPct:1.0,  spPct:2.0 },
-    { id:'socgen',   name:'Société Générale Ghana',   shortName:'SGA', type:'International', color:'#CC0000', premPct:1.2,  spPct:2.9 },
-    { id:'zenith',   name:'Zenith Bank Ghana',        shortName:'ZEN', type:'Commercial',    color:'#4A235A', premPct:1.1,  spPct:2.4 },
-    { id:'uba',      name:'UBA Ghana',                shortName:'UBA', type:'Pan-African',   color:'#A93226', premPct:1.1,  spPct:2.3 },
-    { id:'calbank',  name:'CalBank',                  shortName:'CAL', type:'Commercial',    color:'#884EA0', premPct:1.1,  spPct:2.3 },
-    { id:'adb',      name:'Agricultural Dev. Bank',   shortName:'ADB', type:'State-owned',   color:'#196F3D', premPct:0.6,  spPct:1.2 },
-    { id:'boagh',    name:'Bank of Africa Ghana',     shortName:'BOA', type:'Pan-African',   color:'#00539C', premPct:1.1,  spPct:2.4 },
-    { id:'cbg',      name:'Consolidated Bank Ghana',  shortName:'CBG', type:'State-owned',   color:'#CA6F1E', premPct:0.7,  spPct:1.3 },
-    { id:'fbnbank',  name:'FBNBank Ghana',            shortName:'FBN', type:'Commercial',    color:'#1C4E80', premPct:1.1,  spPct:2.3 },
-    { id:'fab',      name:'First Atlantic Bank',      shortName:'FAB', type:'Commercial',    color:'#148F77', premPct:1.0,  spPct:2.0 },
-    { id:'fnb',      name:'First National Bank',      shortName:'FNB', type:'International', color:'#C0392B', premPct:1.3,  spPct:3.1 },
-    { id:'gtbank',   name:'GTBank Ghana',             shortName:'GTB', type:'Commercial',    color:'#F39C12', premPct:1.0,  spPct:2.1 },
-    { id:'nib',      name:'National Investment Bank', shortName:'NIB', type:'State-owned',   color:'#1A6B4A', premPct:0.7,  spPct:1.4 },
-    { id:'omnibsic', name:'OmniBSIC Bank',            shortName:'OMN', type:'Commercial',    color:'#2E4057', premPct:1.0,  spPct:2.1 },
-    { id:'pru',      name:'Prudential Bank',          shortName:'PRU', type:'Commercial',    color:'#5D6D7E', premPct:1.0,  spPct:2.0 },
-    { id:'umb',      name:'Universal Merchant Bank',  shortName:'UMB', type:'Commercial',    color:'#6E2F8B', premPct:1.0,  spPct:2.2 },
+    { id:'ecobank',  name:'Ecobank Ghana',            shortName:'ECO', type:'Pan-African',   color:'#006400', premPct:1.0,  spPct:2.2 },
   ];
   const banks = BANK_DEFS.map(b => {
     const bankMid = +(mid * (1 + b.premPct / 100)).toFixed(4);
